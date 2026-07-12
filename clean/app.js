@@ -7,6 +7,7 @@ const { AppError, openAiError } = require('./errors');
 const defaultCatPawAiClient = require('./catpawai-client');
 const { DEFAULT_MODEL_ID, MODELS } = require('./models');
 const logger = require('./logger');
+const { createToolCallInterceptor } = require('./stream-interceptor');
 
 function validateChatRequest(body) {
   if (!body || typeof body !== 'object') {
@@ -99,9 +100,14 @@ function createApp({ env = process.env, catpawaiClient = defaultCatPawAiClient }
         const nodeStream = Readable.fromWeb(upstream.body);
         nodeStream.on('error', (err) => {
           logger.error('Stream transmission error', err);
-          res.destroy();
+          res.destroy(err);
         });
-        nodeStream.pipe(res);
+        const interceptor = createToolCallInterceptor();
+        interceptor.on('error', (err) => {
+          logger.error('Interceptor error', err);
+          res.destroy(err);
+        });
+        nodeStream.pipe(interceptor).pipe(res);
         return;
       }
       const result = await catpawaiClient.createChatCompletion({
