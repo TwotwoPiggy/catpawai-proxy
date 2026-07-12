@@ -3,8 +3,8 @@
 ## Active Requirements (v1.0)
 
 ### Observability
-- [ ] **OBS-01**: The proxy intercepts all output logs and masks authentication tokens and environment credentials before writing to stdout.
-- [ ] **OBS-02**: The proxy uses a structured logging library to capture and report upstream connection errors without crashing.
+- [x] **OBS-01**: The proxy intercepts all output logs and masks authentication tokens and environment credentials before writing to stdout.
+- [x] **OBS-02**: The proxy uses a structured logging library to capture and report upstream connection errors without crashing.
 
 ### Tool Calling Core
 - [ ] **CORE-01**: The proxy intercepts malformed JSON `tool_calls` arguments from the CatPawAI stream and automatically repairs them into valid JSON before forwarding to the client.
