@@ -2,9 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Tool Calling Fix & Optimization
+current_phase: 1
 status: planning
-last_updated: "2026-07-12T11:47:51+08:00"
+stopped_at: Phase 1 context gathered
+last_updated: "2026-07-12T03:57:50.610Z"
 last_activity: 2026-07-12
+last_activity_desc: Created milestone v1.0 roadmap
 progress:
   total_phases: 3
   completed_phases: 0
@@ -21,3 +24,9 @@ Phase: 1
 Plan: —
 Status: Roadmap created
 Last activity: 2026-07-12 — Created milestone v1.0 roadmap
+
+## Session
+
+**Last session:** 2026-07-12T03:57:50.599Z
+**Stopped at:** Phase 1 context gathered
+**Resume file:** .planning/phases/01-observability-setup-security/01-CONTEXT.md
