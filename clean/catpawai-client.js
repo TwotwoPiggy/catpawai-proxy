@@ -51,8 +51,13 @@ function getPlatformInfo() {
 }
 
 function getCatPawVersions(env) {
-  const productJson = env.CATPAWAI_PRODUCT_JSON || DEFAULT_CATPAW_PRODUCT_JSON;
-  const extensionPackageJson = env.CATPAWAI_EXTENSION_PACKAGE_JSON || DEFAULT_CATPAW_EXTENSION_PACKAGE_JSON;
+  const configuredCliPath = env.CATPAWAI_CLI_PATH || DEFAULT_CLI_PATH;
+  const installDir = path.dirname(path.dirname(configuredCliPath));
+  const defaultProductJson = path.join(installDir, 'resources', 'app', 'product.json');
+  const defaultExtensionPackageJson = path.join(installDir, 'resources', 'app', 'extensions', 'mt-idekit.mt-idekit-code', 'package.json');
+
+  const productJson = env.CATPAWAI_PRODUCT_JSON || defaultProductJson;
+  const extensionPackageJson = env.CATPAWAI_EXTENSION_PACKAGE_JSON || defaultExtensionPackageJson;
   return {
     ideVersion:
       env.CATPAWAI_IDE_VERSION ||

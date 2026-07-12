@@ -23,6 +23,12 @@ function xorDecipher(encoded, key = XOR_KEY) {
 
 function resolveDefaultExtensionPath() {
   if (fs.existsSync(PROJECT_EXTENSION_JS)) return PROJECT_EXTENSION_JS;
+  
+  const cliPath = process.env.CATPAWAI_CLI_PATH || 'D:\\Programs\\CatPawAI\\bin\\catpawai.cmd';
+  const installDir = path.dirname(path.dirname(cliPath));
+  const dynamicPath = path.join(installDir, 'resources', 'app', 'extensions', 'mt-idekit.mt-idekit-code', 'out', 'extension.js');
+  if (fs.existsSync(dynamicPath)) return dynamicPath;
+
   return WINDOWS_EXTENSION_JS;
 }
 

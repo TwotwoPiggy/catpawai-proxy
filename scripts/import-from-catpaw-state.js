@@ -1,7 +1,50 @@
 const fs = require('fs');
 const path = require('path');
 
-const SQLITE3_PATH = 'D:/Programs/CatPawAI/resources/app/node_modules/@vscode/sqlite3';
+function discoverInstallDir() {
+  if (process.env.CATPAWAI_INSTALL_DIR) {
+    return process.env.CATPAWAI_INSTALL_DIR;
+  }
+  if (process.env.CATPAWAI_CLI_PATH) {
+    return path.dirname(path.dirname(process.env.CATPAWAI_CLI_PATH));
+  }
+
+  const commonPaths = [
+    'D:/Computers/Ide/CatPawAI',
+    'D:/Programs/CatPawAI',
+    path.join(process.env.LOCALAPPDATA || '', 'Programs', 'CatPawAI'),
+    'C:/Programs/CatPawAI',
+    'C:/Program Files/CatPawAI'
+  ];
+  for (const p of commonPaths) {
+    if (fs.existsSync(path.join(p, 'resources/app/node_modules/@vscode/sqlite3'))) {
+      return p;
+    }
+  }
+
+  try {
+    const { execSync } = require('child_process');
+    const cmd = 'reg query "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall" /s /f "CatPawAI" /k';
+    const output = execSync(cmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    const match = output.match(/Uninstall\\([^\r\n]+)/);
+    if (match) {
+      const key = match[1];
+      const detailCmd = `reg query "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${key}" /v "InstallLocation"`;
+      const detailOutput = execSync(detailCmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+      const locMatch = detailOutput.match(/InstallLocation\s+REG_SZ\s+([^\r\n]+)/);
+      if (locMatch && locMatch[1]) {
+        return locMatch[1].trim();
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return 'D:/Programs/CatPawAI';
+}
+
+const INSTALL_DIR = discoverInstallDir();
+const SQLITE3_PATH = path.join(INSTALL_DIR, 'resources/app/node_modules/@vscode/sqlite3');
 const STATE_DB_PATH = path.join(
   process.env.APPDATA || path.join(process.env.USERPROFILE || '', 'AppData/Roaming'),
   'CatPawAI',
@@ -21,7 +64,7 @@ function loadSqlite3() {
   try {
     return require(SQLITE3_PATH);
   } catch (error) {
-    throw new Error(`Cannot load CatPawAI sqlite module: ${error.message}`);
+    throw new Error(`Cannot load CatPawAI sqlite module from "${SQLITE3_PATH}": ${error.message}`);
   }
 }
 
@@ -112,6 +155,7 @@ async function main() {
   lines = setEnvLine(lines, 'CATPAWAI_MODEL', model);
   lines = setEnvLine(lines, 'CATPAWAI_IDE_VERSION', DEFAULT_IDE_VERSION);
   lines = setEnvLine(lines, 'CATPAWAI_PLUGIN_VERSION', DEFAULT_PLUGIN_VERSION);
+  lines = setEnvLine(lines, 'CATPAWAI_CLI_PATH', path.join(INSTALL_DIR, 'bin', 'catpawai.cmd'));
   fs.writeFileSync(ENV_PATH, lines.join('\n'), 'utf8');
 
   console.log('.env updated from CatPawAI local state.');
