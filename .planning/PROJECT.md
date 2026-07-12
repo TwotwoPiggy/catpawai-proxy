@@ -1,5 +1,14 @@
 # CatPawAI Proxy Tool Calling Fix & Optimization
 
+## Current Milestone: v1.0 Tool Calling Fix & Optimization
+
+**Goal:** 修复并全面优化代理的工具调用功能，以兼容 OpenCode 等客户端。
+
+**Target features:**
+- 修复 `tool_calls` 返回的无效 JSON 格式（缺少数组边界等）
+- 完善系统对多个并行工具调用的兼容性
+- 优化错误处理机制和日志输出格式
+
 ## What This Is
 
 一个将 OpenAI 兼容的 API 请求（如来自 OpenCode 的请求）转换为 CatPawAI 原生请求的本地 Express.js 代理。当前重点是修复工具调用时返回的 JSON 格式错误，并全面优化代理的工具兼容性、错误处理和日志记录。
