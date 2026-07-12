@@ -6,6 +6,7 @@ const { Readable } = require('node:stream');
 const { AppError, openAiError } = require('./errors');
 const defaultCatPawAiClient = require('./catpawai-client');
 const { DEFAULT_MODEL_ID, MODELS } = require('./models');
+const logger = require('./logger');
 
 function validateChatRequest(body) {
   if (!body || typeof body !== 'object') {
@@ -95,7 +96,12 @@ function createApp({ env = process.env, catpawaiClient = defaultCatPawAiClient }
           res.end();
           return;
         }
-        Readable.fromWeb(upstream.body).pipe(res);
+        const nodeStream = Readable.fromWeb(upstream.body);
+        nodeStream.on('error', (err) => {
+          logger.error('Stream transmission error', err);
+          res.destroy();
+        });
+        nodeStream.pipe(res);
         return;
       }
       const result = await catpawaiClient.createChatCompletion({
@@ -104,12 +110,14 @@ function createApp({ env = process.env, catpawaiClient = defaultCatPawAiClient }
       });
       res.status(200).json(result);
     } catch (error) {
+      logger.error('Chat completion failed', error);
       const { status, body } = openAiError(error);
       res.status(status).json(body);
     }
   });
 
   app.use((error, _req, res, _next) => {
+    logger.error('Unhandled server error', error);
     const { status, body } = openAiError(error);
     res.status(status).json(body);
   });
