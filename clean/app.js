@@ -3,11 +3,13 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Readable } = require('node:stream');
+const path = require('path');
 const { AppError, openAiError } = require('./errors');
 const defaultCatPawAiClient = require('./catpawai-client');
 const { DEFAULT_MODEL_ID, MODELS } = require('./models');
 const logger = require('./logger');
 const { createToolCallInterceptor } = require('./stream-interceptor');
+const { importFromCatPawState } = require('../scripts/import-from-catpaw-state');
 
 function validateChatRequest(body) {
   if (!body || typeof body !== 'object') {
@@ -30,6 +32,12 @@ function createApp({ env = process.env, catpawaiClient = defaultCatPawAiClient }
   const app = express();
   app.use(cors());
   app.use(express.json({ limit: '2mb' }));
+  
+  let isProxyEnabled = true;
+  let autoRefreshInterval = null;
+  let autoRefreshIntervalMs = 0;
+
+  app.use('/', express.static(path.join(__dirname, '../public')));
 
   function getDiagnostics() {
     const discovery = catpawaiClient.discoverCatPawAi(env);
@@ -73,6 +81,15 @@ function createApp({ env = process.env, catpawaiClient = defaultCatPawAiClient }
   });
 
   app.post('/v1/chat/completions', async (req, res) => {
+    if (!isProxyEnabled) {
+      return res.status(503).json({
+        error: {
+          message: 'Proxy is currently disabled via UI.',
+          type: 'proxy_disabled',
+          code: 'service_unavailable'
+        }
+      });
+    }
     try {
       validateChatRequest(req.body);
       const request = {
@@ -120,6 +137,84 @@ function createApp({ env = process.env, catpawaiClient = defaultCatPawAiClient }
       const { status, body } = openAiError(error);
       res.status(status).json(body);
     }
+  });
+
+  // UI API Endpoints
+  app.get('/api/status', (req, res) => {
+    const token = env.CATPAWAI_ACCESS_TOKEN || env.CATPAWAI_API_KEY || '';
+    res.json({
+      ok: true,
+      proxyEnabled: isProxyEnabled,
+      autoRefreshInterval: autoRefreshIntervalMs,
+      tokenPreview: token ? `${token.slice(0, 4)}...${token.slice(-4)}` : 'Not Set'
+    });
+  });
+
+  app.post('/api/proxy/toggle', (req, res) => {
+    isProxyEnabled = Boolean(req.body.enabled);
+    logger.info(`Proxy ${isProxyEnabled ? 'enabled' : 'disabled'} via UI`);
+    res.json({ ok: true, proxyEnabled: isProxyEnabled });
+  });
+
+  app.post('/api/server/exit', (req, res) => {
+    logger.info('Server shutdown requested via UI');
+    res.json({ ok: true });
+    setTimeout(() => process.exit(0), 500);
+  });
+
+  app.post('/api/state/refresh', async (req, res) => {
+    try {
+      logger.info('Manual state refresh triggered');
+      await importFromCatPawState();
+      // Reload .env into process.env dynamically
+      require('dotenv').config({ override: true });
+      res.json({ ok: true });
+    } catch (err) {
+      logger.error('State refresh failed', err);
+      res.status(500).json({ ok: false, error: err.message });
+    }
+  });
+
+  app.post('/api/state/auto', (req, res) => {
+    const { intervalMs } = req.body;
+    if (autoRefreshInterval) {
+      clearInterval(autoRefreshInterval);
+      autoRefreshInterval = null;
+    }
+    autoRefreshIntervalMs = Number(intervalMs) || 0;
+    
+    if (autoRefreshIntervalMs > 0) {
+      logger.info(`Auto-refresh enabled for every ${autoRefreshIntervalMs}ms`);
+      autoRefreshInterval = setInterval(async () => {
+        try {
+          logger.info('Auto-refresh triggered');
+          await importFromCatPawState();
+          require('dotenv').config({ override: true });
+        } catch (err) {
+          logger.error('Auto-refresh failed', err);
+        }
+      }, autoRefreshIntervalMs);
+    } else {
+      logger.info('Auto-refresh disabled');
+    }
+    res.json({ ok: true, autoRefreshInterval: autoRefreshIntervalMs });
+  });
+
+  app.get('/api/logs/stream', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    const onLog = (logObj) => {
+      res.write(`data: ${JSON.stringify(logObj)}\n\n`);
+    };
+
+    logger.logEmitter.on('log', onLog);
+    
+    req.on('close', () => {
+      logger.logEmitter.off('log', onLog);
+    });
   });
 
   app.use((error, _req, res, _next) => {

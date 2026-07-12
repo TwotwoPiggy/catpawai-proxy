@@ -1,4 +1,7 @@
 const { redactString, redactObject } = require('./redact');
+const { EventEmitter } = require('node:events');
+
+const logEmitter = new EventEmitter();
 
 const LOG_LEVELS = {
   debug: 0,
@@ -50,6 +53,8 @@ function print(levelName, message, meta) {
   } else {
     console.log(redactedLine);
   }
+
+  logEmitter.emit('log', { level: levelName, message: redactedLine, timestamp: new Date().toISOString() });
 }
 
 function debug(message, meta) {
@@ -78,4 +83,5 @@ module.exports = {
   warn,
   error,
   log,
+  logEmitter,
 };

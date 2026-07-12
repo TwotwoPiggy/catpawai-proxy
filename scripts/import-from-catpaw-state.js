@@ -166,7 +166,11 @@ async function main() {
   console.log(`Base URL: ${baseUrlForTenant(tenant)}`);
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+module.exports = { importFromCatPawState: main };
+
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}
