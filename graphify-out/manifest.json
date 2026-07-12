@@ -1,0 +1,187 @@
+{
+  ".planning/config.json": {
+    "mtime": 1783824652.235532,
+    "ast_hash": "13a39e08ef724a0d79acc17f3c31dc61",
+    "semantic_hash": ""
+  },
+  "clean/app.js": {
+    "mtime": 1783824032.447958,
+    "ast_hash": "a457ffad6bd27cd4220ecac5088ed286",
+    "semantic_hash": ""
+  },
+  "clean/catpaw-crypto.js": {
+    "mtime": 1783824032.4489634,
+    "ast_hash": "a5161c591ccab9474f51f58128fb46f5",
+    "semantic_hash": ""
+  },
+  "clean/catpawai-client.js": {
+    "mtime": 1783824032.4499612,
+    "ast_hash": "078dc4e6fd80b143b971ff625518b3ea",
+    "semantic_hash": ""
+  },
+  "clean/errors.js": {
+    "mtime": 1783824032.4509616,
+    "ast_hash": "4a4c80adf6e86b68a739c576785796aa",
+    "semantic_hash": ""
+  },
+  "clean/logger.js": {
+    "mtime": 1783824032.4519618,
+    "ast_hash": "11ace087b8bb7c6ca17a4442bce6c336",
+    "semantic_hash": ""
+  },
+  "clean/models.js": {
+    "mtime": 1783824032.4529245,
+    "ast_hash": "636b502f879825125fde1ad06b715716",
+    "semantic_hash": ""
+  },
+  "clean/redact.js": {
+    "mtime": 1783824032.453958,
+    "ast_hash": "3692af518e87cdf84c13f419ee3ae5f0",
+    "semantic_hash": ""
+  },
+  "clean/server.js": {
+    "mtime": 1783824032.454924,
+    "ast_hash": "f97ff1c99e170590e923d73647fd44f4",
+    "semantic_hash": ""
+  },
+  "package.json": {
+    "mtime": 1783824032.4619732,
+    "ast_hash": "d41f449c9b75527eefbaeef0def8dca4",
+    "semantic_hash": ""
+  },
+  "scripts/configure-auth.ps1": {
+    "mtime": 1783824032.4639707,
+    "ast_hash": "0aa429370cba022faa6e836b3c83fa53",
+    "semantic_hash": ""
+  },
+  "scripts/configure-from-catpaw-config.ps1": {
+    "mtime": 1783824032.4649599,
+    "ast_hash": "a9e5515840cacdb339837e86db53f4d4",
+    "semantic_hash": ""
+  },
+  "scripts/diagnose.js": {
+    "mtime": 1783824032.465958,
+    "ast_hash": "49c4f91a85e0f3beaa76d39bcf399341",
+    "semantic_hash": ""
+  },
+  "scripts/export-catpaw-extension.ps1": {
+    "mtime": 1783824032.4679585,
+    "ast_hash": "4b9e34170fddda55aca4d4c64d334437",
+    "semantic_hash": ""
+  },
+  "scripts/import-from-catpaw-state.js": {
+    "mtime": 1783824032.4689696,
+    "ast_hash": "ba54d58e263ffe13b9cbf52f96750db7",
+    "semantic_hash": ""
+  },
+  "scripts/install-systemd.sh": {
+    "mtime": 1783824032.4699247,
+    "ast_hash": "cf785cbf453fcb6a20c6774dbc0c2f4a",
+    "semantic_hash": ""
+  },
+  "scripts/smoke.js": {
+    "mtime": 1783824032.470968,
+    "ast_hash": "6a9b6849e08aa7d42a8f0ad31e754e07",
+    "semantic_hash": ""
+  },
+  "scripts/sync-server-env.ps1": {
+    "mtime": 1783824032.4719584,
+    "ast_hash": "ffe8d5f8184c65eec33b0e6d657adae0",
+    "semantic_hash": ""
+  },
+  "scripts/sync_server_env_paramiko.py": {
+    "mtime": 1783824032.472958,
+    "ast_hash": "c289ba139805a16062954808758f5879",
+    "semantic_hash": ""
+  },
+  "start-linux.sh": {
+    "mtime": 1783824032.4739592,
+    "ast_hash": "5157bfc3c659727f2187732b63f8a1cf",
+    "semantic_hash": ""
+  },
+  "sync-server-env.local.example.json": {
+    "mtime": 1783824032.477924,
+    "ast_hash": "e421a8b5b1a8750ee7717edb038aff5c",
+    "semantic_hash": ""
+  },
+  "test/catpawai-client.test.js": {
+    "mtime": 1783824032.478961,
+    "ast_hash": "acbe4f73458b62c4020e377629295248",
+    "semantic_hash": ""
+  },
+  "test/http.test.js": {
+    "mtime": 1783824032.4809585,
+    "ast_hash": "0f5cbeb3897d115d8499a865e342cb69",
+    "semantic_hash": ""
+  },
+  "test/models.test.js": {
+    "mtime": 1783824032.4809585,
+    "ast_hash": "d20b73ee22810f7ecf657ca11bcd3ca5",
+    "semantic_hash": ""
+  },
+  "test/redact.test.js": {
+    "mtime": 1783824032.4819613,
+    "ast_hash": "3d97a9947e3d0cc8ad6b8c1bae6a89a1",
+    "semantic_hash": ""
+  },
+  ".planning/codebase/ARCHITECTURE.md": {
+    "mtime": 1783824465.7765315,
+    "ast_hash": "f59849f2c213d2bb278f111a4e20594c",
+    "semantic_hash": ""
+  },
+  ".planning/codebase/CONCERNS.md": {
+    "mtime": 1783824468.3753383,
+    "ast_hash": "f5e2422de0105771e153f2eefbf5347e",
+    "semantic_hash": ""
+  },
+  ".planning/codebase/CONVENTIONS.md": {
+    "mtime": 1783824468.290066,
+    "ast_hash": "a9b6ed50e4a9f475c2b0bdfd3ec8bbb5",
+    "semantic_hash": ""
+  },
+  ".planning/codebase/INTEGRATIONS.md": {
+    "mtime": 1783824464.3664095,
+    "ast_hash": "6ada7d2a166325d1fa1dd848256f07f4",
+    "semantic_hash": ""
+  },
+  ".planning/codebase/STACK.md": {
+    "mtime": 1783824462.336641,
+    "ast_hash": "db06dd008facd793ccd7db866cbe1be2",
+    "semantic_hash": ""
+  },
+  ".planning/codebase/STRUCTURE.md": {
+    "mtime": 1783824466.7033274,
+    "ast_hash": "d199011266d4ce0e13e48fb929b3b882",
+    "semantic_hash": ""
+  },
+  ".planning/codebase/TESTING.md": {
+    "mtime": 1783824468.3067138,
+    "ast_hash": "83af5ef9842581fcc5d5458a5fbe29b1",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1783824032.4429605,
+    "ast_hash": "a714497e90385f0087da44e50d0a1870",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1783824032.4439247,
+    "ast_hash": "5930b2c14d2a9951bd869a2c24422f55",
+    "semantic_hash": ""
+  },
+  "README.zh-CN.md": {
+    "mtime": 1783824032.4449582,
+    "ast_hash": "bbe48033c670180f586ffdc5f5df9851",
+    "semantic_hash": ""
+  },
+  "UBUNTU_DEPLOY.md": {
+    "mtime": 1783824032.4459617,
+    "ast_hash": "c4b3483715eeef949258272519f06e0a",
+    "semantic_hash": ""
+  },
+  "requirements-python.txt": {
+    "mtime": 1783824032.4619732,
+    "ast_hash": "ea19cca345ae3679be92d0dbb0a617de",
+    "semantic_hash": ""
+  }
+}
