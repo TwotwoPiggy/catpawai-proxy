@@ -543,19 +543,27 @@ function createSseTransform(responseHeaders, env) {
   let buffer = '';
   return new TransformStream({
     transform(chunk, controller) {
-      buffer += decoder.decode(chunk, { stream: true });
-      const lines = buffer.split(/\r?\n/);
-      buffer = lines.pop() || '';
-      for (const line of lines) {
-        if (!line.startsWith('data:')) continue;
-        const payload = parseSsePayload(line.slice(5).trim(), responseHeaders, env);
-        if (payload) controller.enqueue(encoder.encode(toOpenAiStreamLine(payload)));
+      try {
+        buffer += decoder.decode(chunk, { stream: true });
+        const lines = buffer.split(/\r?\n/);
+        buffer = lines.pop() || '';
+        for (const line of lines) {
+          if (!line.startsWith('data:')) continue;
+          const payload = parseSsePayload(line.slice(5).trim(), responseHeaders, env);
+          if (payload) controller.enqueue(encoder.encode(toOpenAiStreamLine(payload)));
+        }
+      } catch (err) {
+        throw new AppError(502, 'catpawai_stream_interrupted', err.message || 'Stream payload decoding failed.', 'upstream_error');
       }
     },
     flush(controller) {
-      if (!buffer.startsWith('data:')) return;
-      const payload = parseSsePayload(buffer.slice(5).trim(), responseHeaders, env);
-      if (payload) controller.enqueue(encoder.encode(toOpenAiStreamLine(payload)));
+      try {
+        if (!buffer.startsWith('data:')) return;
+        const payload = parseSsePayload(buffer.slice(5).trim(), responseHeaders, env);
+        if (payload) controller.enqueue(encoder.encode(toOpenAiStreamLine(payload)));
+      } catch (err) {
+        throw new AppError(502, 'catpawai_stream_interrupted', err.message || 'Stream payload decoding failed.', 'upstream_error');
+      }
     },
   });
 }
@@ -627,19 +635,33 @@ async function requestChatCompletion({
           parallel_tool_calls,
         });
     const url = isNativeCatPaw ? getCatPawNativeChatUrl(baseUrl) : `${baseUrl}/chat/completions`;
-    const response = await fetchImpl(url, {
-      method: 'POST',
-      headers,
-      body: encryptRequestBodyIfNeeded(payload, headers, env),
-      signal: controller.signal,
-    });
 
-    if (!response.ok) {
-      const detail = await readErrorBody(response);
-      throw new AppError(response.status, 'catpawai_upstream_error', detail, 'upstream_error');
+    try {
+      const response = await fetchImpl(url, {
+        method: 'POST',
+        headers,
+        body: encryptRequestBodyIfNeeded(payload, headers, env),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const detail = await readErrorBody(response);
+        throw new AppError(response.status, 'catpawai_upstream_error', detail, 'upstream_error');
+      }
+
+      return response;
+    } catch (err) {
+      if (err instanceof AppError) {
+        throw err;
+      }
+      if (err.name === 'AbortError') {
+        throw new AppError(504, 'catpawai_upstream_timeout', 'Request to upstream timed out.', 'upstream_error');
+      }
+      if (['ENOTFOUND', 'ECONNREFUSED', 'EADDRNOTAVAIL'].includes(err.code)) {
+        throw new AppError(502, 'catpawai_connection_failed', 'Failed to establish connection to CatPawAI upstream.', 'upstream_error');
+      }
+      throw new AppError(502, 'catpawai_upstream_error', err.message || 'Unknown upstream request error.', 'upstream_error');
     }
-
-    return response;
   } finally {
     clearTimeout(timer);
   }

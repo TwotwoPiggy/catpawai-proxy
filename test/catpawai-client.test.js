@@ -424,3 +424,86 @@ test('CatPaw crypto encrypts requests and decrypts responses', () => {
   assert.equal(typeof headers['encrypted-key'], 'string');
   assert.deepEqual(catpawCrypto.decryptResponse(encrypted, headers), { message: 'hello' });
 });
+
+test('requestChatCompletion wraps AbortError as 504 AppError', async () => {
+  const fetchImpl = async () => {
+    const err = new Error('The operation was aborted.');
+    err.name = 'AbortError';
+    throw err;
+  };
+
+  await assert.rejects(
+    () =>
+      createChatCompletion({
+        model: 'catpawai',
+        messages: [{ role: 'user', content: 'hi' }],
+        env: {
+          CATPAWAI_OPENAI_BASE_URL: 'http://127.0.0.1:8888/v1',
+          CATPAWAI_API_KEY: 'secret',
+        },
+        fetchImpl,
+      }),
+    (error) =>
+      error instanceof AppError &&
+      error.status === 504 &&
+      error.code === 'catpawai_upstream_timeout' &&
+      error.message === 'Request to upstream timed out.'
+  );
+});
+
+test('requestChatCompletion wraps ENOTFOUND/ECONNREFUSED as 502 AppError', async () => {
+  const fetchImpl = async () => {
+    const err = new Error('getaddrinfo ENOTFOUND catpaw.meituan.com');
+    err.code = 'ENOTFOUND';
+    throw err;
+  };
+
+  await assert.rejects(
+    () =>
+      createChatCompletion({
+        model: 'catpawai',
+        messages: [{ role: 'user', content: 'hi' }],
+        env: {
+          CATPAWAI_OPENAI_BASE_URL: 'http://127.0.0.1:8888/v1',
+          CATPAWAI_API_KEY: 'secret',
+        },
+        fetchImpl,
+      }),
+    (error) =>
+      error instanceof AppError &&
+      error.status === 502 &&
+      error.code === 'catpawai_connection_failed' &&
+      /Failed to establish connection/.test(error.message)
+  );
+});
+
+test('requestChatCompletion handles non-2xx status and propagates upstream error details', async () => {
+  const fetchImpl = async () => {
+    return {
+      ok: false,
+      status: 403,
+      statusText: 'Forbidden',
+      headers: new Headers({ 'content-type': 'application/json' }),
+      json: async () => ({ error: { message: 'IP is blocked.' } }),
+      text: async () => JSON.stringify({ error: { message: 'IP is blocked.' } }),
+    };
+  };
+
+  await assert.rejects(
+    () =>
+      createChatCompletion({
+        model: 'catpawai',
+        messages: [{ role: 'user', content: 'hi' }],
+        env: {
+          CATPAWAI_OPENAI_BASE_URL: 'http://127.0.0.1:8888/v1',
+          CATPAWAI_API_KEY: 'secret',
+        },
+        fetchImpl,
+      }),
+    (error) =>
+      error instanceof AppError &&
+      error.status === 403 &&
+      error.code === 'catpawai_upstream_error' &&
+      /IP is blocked/.test(error.message)
+  );
+});
