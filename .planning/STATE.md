@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Tool Calling Fix & Optimization
 status: planning
-last_updated: "2026-07-12T03:34:38.485Z"
+last_updated: "2026-07-12T11:47:51+08:00"
 last_activity: 2026-07-12
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,7 +17,7 @@ progress:
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 1
 Plan: —
-Status: Defining requirements
-Last activity: 2026-07-12 — Milestone v1.0 started
+Status: Roadmap created
+Last activity: 2026-07-12 — Created milestone v1.0 roadmap

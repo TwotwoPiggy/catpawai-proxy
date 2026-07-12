@@ -18,3 +18,11 @@
 - [State Management]: The proxy remains stateless; no conversational memory is held at the proxy layer.
 
 ## Traceability
+
+| Requirement | Phase | Description |
+|---|---|---|
+| OBS-01 | Phase 1 | Token masking and credential redaction |
+| OBS-02 | Phase 1 | Structured logging and error reporting |
+| CORE-01 | Phase 2 | JSON repair for `tool_calls` |
+| CORE-02 | Phase 2 | Buffer and concatenate streaming chunks |
+| CORE-03 | Phase 3 | Support parallel tool calls mapping |
