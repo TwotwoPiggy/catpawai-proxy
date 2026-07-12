@@ -2,16 +2,38 @@
   "name": "catpawai-proxy",
   "version": "0.1.0",
   "description": "Local OpenAI-compatible proxy for CatPawAI",
-  "main": "clean/server.js",
+  "main": "electron-main.js",
   "scripts": {
-    "start": "node clean/server.js",
+    "start": "electron .",
     "dev": "node clean/server.js",
     "test": "node --test",
     "diagnose": "node scripts/diagnose.js",
     "configure-auth": "powershell -ExecutionPolicy Bypass -File scripts/configure-auth.ps1",
     "configure-from-catpaw-config": "powershell -ExecutionPolicy Bypass -File scripts/configure-from-catpaw-config.ps1",
     "import-from-catpaw-state": "node scripts/import-from-catpaw-state.js",
-    "smoke": "node scripts/smoke.js"
+    "smoke": "node scripts/smoke.js",
+    "dev:electron": "electron .",
+    "build:exe": "electron-builder -w"
+  },
+  "build": {
+    "appId": "com.twotwopiggy.catpawai-proxy",
+    "productName": "CatPawAI Proxy",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "files": [
+      "clean/**/*",
+      "public/**/*",
+      "scripts/**/*",
+      "electron-main.js",
+      "package.json"
+    ]
   },
   "keywords": [
     "catpawai",
@@ -26,5 +48,9 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "electron": "^43.1.0",
+    "electron-builder": "^26.15.3"
   }
 }
