@@ -143,20 +143,40 @@ async function main() {
   if (!token) throw new Error('CatPawAI accessTokenprod was not found. Please log in to CatPawAI first.');
   if (!misId) throw new Error('CatPawAI userInfoprod.misId was not found. Please log in to CatPawAI first.');
 
-  let lines = readEnvLines();
-  lines = setEnvLine(lines, 'HOST', '127.0.0.1');
-  lines = setEnvLine(lines, 'PORT', '13000');
-  lines = setEnvLine(lines, 'CATPAWAI_OPENAI_BASE_URL', baseUrlForTenant(tenant));
-  lines = setEnvLine(lines, 'CATPAWAI_AUTH_MODE', 'catpaw');
-  lines = setEnvLine(lines, 'CATPAWAI_ACCESS_TOKEN', token);
-  lines = setEnvLine(lines, 'CATPAWAI_MIS_ID', misId);
-  lines = setEnvLine(lines, 'CATPAWAI_TENANT', tenant);
-  lines = setEnvLine(lines, 'CATPAWAI_API_KEY', '');
-  lines = setEnvLine(lines, 'CATPAWAI_MODEL', model);
-  lines = setEnvLine(lines, 'CATPAWAI_IDE_VERSION', DEFAULT_IDE_VERSION);
-  lines = setEnvLine(lines, 'CATPAWAI_PLUGIN_VERSION', DEFAULT_PLUGIN_VERSION);
-  lines = setEnvLine(lines, 'CATPAWAI_CLI_PATH', path.join(INSTALL_DIR, 'bin', 'catpawai.cmd'));
-  fs.writeFileSync(ENV_PATH, lines.join('\n'), 'utf8');
+  const newEnv = {
+    HOST: '127.0.0.1',
+    PORT: '13000',
+    CATPAWAI_OPENAI_BASE_URL: baseUrlForTenant(tenant),
+    CATPAWAI_AUTH_MODE: 'catpaw',
+    CATPAWAI_ACCESS_TOKEN: token,
+    CATPAWAI_MIS_ID: misId,
+    CATPAWAI_TENANT: tenant,
+    CATPAWAI_API_KEY: '',
+    CATPAWAI_MODEL: model,
+    CATPAWAI_IDE_VERSION: DEFAULT_IDE_VERSION,
+    CATPAWAI_PLUGIN_VERSION: DEFAULT_PLUGIN_VERSION,
+    CATPAWAI_CLI_PATH: path.join(INSTALL_DIR, 'bin', 'catpawai.cmd')
+  };
+
+  // Update process.env dynamically in-memory
+  for (const [k, v] of Object.entries(newEnv)) {
+    process.env[k] = String(v);
+  }
+
+  // Safe file write (avoid crashing if running inside packaged Electron ASAR)
+  if (!__dirname.includes('app.asar')) {
+    try {
+      let lines = readEnvLines();
+      for (const [k, v] of Object.entries(newEnv)) {
+        lines = setEnvLine(lines, k, v);
+      }
+      fs.writeFileSync(ENV_PATH, lines.join('\n'), 'utf8');
+    } catch (e) {
+      console.warn('Could not write to .env file, continuing with in-memory state:', e.message);
+    }
+  } else {
+    console.log('Running inside Electron ASAR. Skipping .env file write.');
+  }
 
   console.log('.env updated from CatPawAI local state.');
   console.log(`Token configured. Length: ${String(token).length}`);

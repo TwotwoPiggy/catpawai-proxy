@@ -44,7 +44,15 @@ async function startServerAndUI() {
   });
 }
 
-app.whenReady().then(() => {
+const { importFromCatPawState } = require('./scripts/import-from-catpaw-state');
+
+app.whenReady().then(async () => {
+  try {
+    await importFromCatPawState();
+  } catch (err) {
+    console.warn('[catpawai-proxy] [WARN] Initial state import failed (this is normal if not logged in):', err.message);
+  }
+
   startServerAndUI();
 
   app.on('activate', () => {
