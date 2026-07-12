@@ -1,0 +1,19 @@
+{
+  "graphify": {
+    "enabled": true
+  },
+  "workflow": {
+    "mode": "yolo",
+    "granularity": "coarse",
+    "parallelization": true,
+    "commit_docs": true,
+    "generate_pr_body": true
+  },
+  "agents": {
+    "research_enabled": true,
+    "plan_check_enabled": true,
+    "verifier_enabled": true,
+    "drift_guard_enabled": true,
+    "model_profile": "inherit"
+  }
+}
